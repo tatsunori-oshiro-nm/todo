@@ -1,103 +1,133 @@
-import { useState } from "react";
 import { useTodos } from "./hooks/useTodos";
-import type { FilterType } from "./types";
-import TodoInput from "./components/TodoInput";
-import FilterBar from "./components/FilterBar";
-import TodoItem from "./components/TodoItem";
+import { STATUS_ORDER } from "./types";
+import TaskGroup from "./components/TaskGroup";
 
 function App() {
-  const { todos, addTodo, toggleTodo, deleteTodo, updateTodo, clearCompleted } =
-    useTodos();
-  const [filter, setFilter] = useState<FilterType>("all");
-
-  const filtered = todos.filter((t) => {
-    if (filter === "active") return !t.completed;
-    if (filter === "completed") return t.completed;
-    return true;
-  });
-
-  const activeCount = todos.filter((t) => !t.completed).length;
-  const completedCount = todos.filter((t) => t.completed).length;
+  const { todos, addTodo, updateStatus, deleteTodo, updateTodo } = useTodos();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-10 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* ヘッダー */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-indigo-700 tracking-tight">
-            TODO
-          </h1>
-          <p className="text-gray-500 mt-1 text-sm">
-            {activeCount > 0
-              ? `${activeCount}件のタスクが残っています`
-              : todos.length === 0
-              ? "タスクを追加してください"
-              : "すべて完了しました！"}
-          </p>
+    <div className="flex h-screen bg-[#111111] text-[#e2e2e2] overflow-hidden">
+      {/* サイドバー */}
+      <aside className="w-11 flex-shrink-0 bg-[#0d0d0d] border-r border-[#1c1c1c] flex flex-col items-center py-3 gap-2">
+        {/* ロゴ */}
+        <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-bold select-none">
+          T
         </div>
-
-        {/* 入力フォーム */}
-        <TodoInput onAdd={addTodo} />
-
-        {/* リスト */}
-        <div className="bg-white rounded-2xl shadow-lg mt-6 overflow-hidden">
-          <FilterBar
-            filter={filter}
-            onFilterChange={setFilter}
-            activeCount={activeCount}
-          />
-
-          {filtered.length === 0 ? (
-            <div className="py-16 text-center text-gray-400">
-              <svg
-                className="w-12 h-12 mx-auto mb-3 text-gray-200"
-                fill="none"
-                viewBox="0 0 24 24"
+        <div className="mt-3 flex flex-col gap-1">
+          {/* ホーム */}
+          <button className="w-8 h-8 flex items-center justify-center text-[#e2e2e2] rounded-lg bg-[#1c1c1c]">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"
                 stroke="currentColor"
-              >
+                strokeWidth="1.3"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          {/* リスト */}
+          <button className="w-8 h-8 flex items-center justify-center text-[#4b5563] hover:text-[#9ca3af] rounded-lg hover:bg-[#1a1a1a] transition-colors">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M2 5h12M2 8h12M2 11h8"
+                stroke="currentColor"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+          {/* 設定 */}
+          <button className="w-8 h-8 flex items-center justify-center text-[#4b5563] hover:text-[#9ca3af] rounded-lg hover:bg-[#1a1a1a] transition-colors">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.3" />
+              <path
+                d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06"
+                stroke="currentColor"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      {/* メインコンテンツ */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* ヘッダー */}
+        <header className="flex items-center justify-between px-5 py-2.5 border-b border-[#1c1c1c] flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="text-[#e2e2e2] font-semibold text-sm">My Tasks</span>
+            <span className="text-[#3f3f46] text-xs">{todos.length}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button className="flex items-center gap-1.5 text-[#6b7280] hover:text-[#9ca3af] text-xs px-2.5 py-1.5 rounded hover:bg-[#1a1a1a] transition-colors">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                 <path
+                  d="M2 4h10M4 7h6M6 10h2"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                 />
               </svg>
-              <p className="text-sm">
-                {filter === "all"
-                  ? "タスクがありません"
-                  : filter === "active"
-                  ? "未完了のタスクはありません"
-                  : "完了済みのタスクはありません"}
-              </p>
-            </div>
-          ) : (
-            <ul>
-              {filtered.map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  onToggle={toggleTodo}
-                  onDelete={deleteTodo}
-                  onUpdate={updateTodo}
+              Filter
+            </button>
+            <button className="flex items-center gap-1.5 text-[#6b7280] hover:text-[#9ca3af] text-xs px-2.5 py-1.5 rounded hover:bg-[#1a1a1a] transition-colors">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                <rect
+                  x="1.5"
+                  y="1.5"
+                  width="4"
+                  height="4"
+                  rx="0.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
                 />
-              ))}
-            </ul>
-          )}
+                <rect
+                  x="8.5"
+                  y="1.5"
+                  width="4"
+                  height="4"
+                  rx="0.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
+                <rect
+                  x="1.5"
+                  y="8.5"
+                  width="4"
+                  height="4"
+                  rx="0.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
+                <rect
+                  x="8.5"
+                  y="8.5"
+                  width="4"
+                  height="4"
+                  rx="0.5"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
+              </svg>
+              Display
+            </button>
+          </div>
+        </header>
 
-          {/* フッター */}
-          {completedCount > 0 && (
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-              <span className="text-xs text-gray-400">
-                {completedCount}件完了
-              </span>
-              <button
-                onClick={clearCompleted}
-                className="text-xs text-red-400 hover:text-red-600 transition-colors"
-              >
-                完了済みをすべて削除
-              </button>
-            </div>
-          )}
+        {/* タスクリスト */}
+        <div className="flex-1 overflow-y-auto">
+          {STATUS_ORDER.map((status) => (
+            <TaskGroup
+              key={status}
+              status={status}
+              todos={todos.filter((t) => t.status === status)}
+              onAddTodo={addTodo}
+              onUpdateStatus={updateStatus}
+              onDelete={deleteTodo}
+              onUpdate={updateTodo}
+            />
+          ))}
         </div>
       </div>
     </div>
